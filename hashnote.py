@@ -1,5 +1,4 @@
 import argparse
-import csv
 import os
 
 if __name__== "__main__":
@@ -10,12 +9,18 @@ if __name__== "__main__":
     args = vars(args)
 
     if len(unknown)>0:
-        if os.path.isfile('notes.csv'): 
-            num_lines = sum(1 for _ in open('notes.csv'))
-        else:
-            num_lines = 0
-        with open('notes.csv', 'a', newline='') as csvfile:
-            spamwriter = csv.writer(csvfile, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-            
+        all_notes = []
+        if os.path.isfile('notes.csv'):
+            with open('notes.csv', 'r', newline='') as notefile:
+                lines=notefile.readlines()
+                for row in lines:
+                    all_notes.append(row.split(" ")[1])
+        with open('notes.csv', 'a', newline='') as notefile:
             for i, note in enumerate(unknown):
-                spamwriter.writerow([f'{num_lines+i:x}', note])
+                # We do not add the note if it is already saved
+                if note in all_notes:
+                    index = all_notes.index(note)
+                    print(lines[index].split(" ")[0])
+                else:
+                    notefile.write(f"{len(all_notes)+i:x} {note} \n")
+                    print(f"{len(all_notes)+i:x}")
